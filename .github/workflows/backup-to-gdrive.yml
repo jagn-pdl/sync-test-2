@@ -32,4 +32,6 @@ jobs:
           rclone sync . gdrive:${{ github.event.repository.name }} \
             --exclude ".git/**" \
             --exclude ".github/**" \
+            --exclude "*.md" \
+            --drive-skip-gdocs \
             -v

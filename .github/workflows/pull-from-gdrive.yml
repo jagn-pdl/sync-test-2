@@ -40,6 +40,9 @@ jobs:
           rclone sync gdrive:${{ github.event.repository.name }} . \
             --exclude ".git/**" \
             --exclude ".github/**" \
+            --filter "+ README.md" \
+            --filter "- *.md" \
+            --drive-skip-gdocs \
             -v
 
       - name: Commit and push changes

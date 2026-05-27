@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backup to Google Drive",
+      "detail": "Stage all, commit, and push — triggers the backup workflow automatically",
+      "type": "shell",
+      "command": "git add -A && git commit -m 'Backup ${input:commitMessage}' && git push",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Restore from Google Drive",
+      "detail": "Triggers the pull-from-gdrive workflow via GitHub CLI",
+      "type": "shell",
+      "command": "gh workflow run pull-from-gdrive.yml --field confirm=YES",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "Commit message",
+      "default": "update"
+    }
+  ]
+}

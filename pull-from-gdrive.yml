@@ -1,0 +1,52 @@
+name: Pull from Google Drive
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type YES to confirm overwrite of repo contents'
+        required: true
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Abort if not confirmed
+        if: ${{ github.event.inputs.confirm != 'YES' }}
+        run: |
+          echo "Confirmation not provided. Aborting."
+          exit 1
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install rclone
+        run: curl https://rclone.org/install.sh | sudo bash
+
+      - name: Configure rclone
+        run: |
+          mkdir -p ~/.config/rclone
+          cat > ~/.config/rclone/rclone.conf << RCLONE
+          [gdrive]
+          type = drive
+          scope = drive
+          service_account_file = /tmp/sa.json
+          root_folder_id = 1LxdBM01phS4BbYylBCCbgI-HcYOHhWJJ
+          RCLONE
+          echo '${{ secrets.GDRIVE_CREDENTIALS }}' > /tmp/sa.json
+
+      - name: Pull from Google Drive to repo
+        run: |
+          rclone sync gdrive:${{ github.event.repository.name }} . \
+            --exclude ".git/**" \
+            --exclude ".github/**" \
+            -v
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Restore from Google Drive [skip ci]"
+          git push

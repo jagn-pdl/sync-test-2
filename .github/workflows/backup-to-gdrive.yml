@@ -17,15 +17,11 @@ jobs:
         uses: AnimMouse/setup-rclone@v1
 
       - name: Configure rclone
+        env:
+          GDRIVE_TOKEN: ${{ secrets.GDRIVE_TOKEN }}
         run: |
           mkdir -p ~/.config/rclone
-          cat > ~/.config/rclone/rclone.conf << EOF
-          [gdrive]
-          type = drive
-          scope = drive
-          token = ${{ secrets.GDRIVE_TOKEN }}
-          root_folder_id = 1LxdBM01phS4BbYylBCCbgI-HcYOHhWJJ
-          EOF
+          printf '[gdrive]\ntype = drive\nscope = drive\ntoken = %s\nroot_folder_id = 1LxdBM01phS4BbYylBCCbgI-HcYOHhWJJ\n' "$GDRIVE_TOKEN" > ~/.config/rclone/rclone.conf
 
       - name: Sync repo to Google Drive
         run: |

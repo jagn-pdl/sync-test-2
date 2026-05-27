@@ -6,14 +6,6 @@ on:
       confirm:
         description: 'Type YES to confirm overwrite of repo contents'
         required: true
-name: Pull from Google Drive
-
-on:
-  workflow_dispatch:
-    inputs:
-      confirm:
-        description: 'Type YES to confirm overwrite of repo contents'
-        required: true
 
 jobs:
   pull:
@@ -33,15 +25,11 @@ jobs:
         uses: AnimMouse/setup-rclone@v1
 
       - name: Configure rclone
+        env:
+          GDRIVE_TOKEN: ${{ secrets.GDRIVE_TOKEN }}
         run: |
           mkdir -p ~/.config/rclone
-          cat > ~/.config/rclone/rclone.conf << EOF
-          [gdrive]
-          type = drive
-          scope = drive
-          token = ${{ secrets.GDRIVE_TOKEN }}
-          root_folder_id = 1LxdBM01phS4BbYylBCCbgI-HcYOHhWJJ
-          EOF
+          printf '[gdrive]\ntype = drive\nscope = drive\ntoken = %s\nroot_folder_id = 1LxdBM01phS4BbYylBCCbgI-HcYOHhWJJ\n' "$GDRIVE_TOKEN" > ~/.config/rclone/rclone.conf
 
       - name: Pull from Google Drive to repo
         run: |
@@ -59,49 +47,4 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --quiet || git commit -m "Restore from Google Drive [skip ci]"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-jobs:
-  pull:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Abort if not confirmed
-        if: ${{ github.event.inputs.confirm != 'YES' }}
-        run: |
-          echo "Confirmation not provided. Aborting."
-          exit 1
-
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install rclone
-        run: curl https://rclone.org/install.sh | sudo bash
-
-      - name: Configure rclone
-        run: |
-          mkdir -p ~/.config/rclone
-          cat > ~/.config/rclone/rclone.conf << EOF
-          [gdrive]
-          type = drive
-          scope = drive
-          token = ${{ secrets.GDRIVE_TOKEN }}
-          root_folder_id = 1LxdBM01phS4BbYylBCCbgI-HcYOHhWJJ
-          EOF
-
-      - name: Pull from Google Drive to repo
-        run: |
-          rclone sync gdrive:${{ github.event.repository.name }} . \
-            --exclude ".git/**" \
-            --exclude ".github/**" \
-            --filter "+ README.md" \
-            --filter "- *.md" \
-            --drive-skip-gdocs \
-            -v
-
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet || git commit -m "Restore from Google Drive [skip ci]"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.gitgit

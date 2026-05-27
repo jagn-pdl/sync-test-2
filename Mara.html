@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Awareness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --col: #4a8ab0;
+    --col28: #4a8ab028;
+    --glow: 14px;
+    --pulse-speed: 3.6s;
+    --bg: #060810;
+  }
+
+  html, body {
+    width: 100%; min-height: 100%;
+    background: var(--bg);
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    color: #d8dff0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px 28px;
+    gap: 22px;
+    background:
+      radial-gradient(ellipse at 30% 15%, #0d1535 0%, transparent 55%),
+      radial-gradient(ellipse at 75% 85%, #100d28 0%, transparent 55%),
+      linear-gradient(155deg, #060810 0%, #08091c 50%, #07091a 100%);
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  header { text-align: center; z-index: 1; }
+
+  h1 {
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 300;
+    letter-spacing: 0.32em;
+    color: #9aacc8;
+    font-style: italic;
+  }
+
+  .tagline {
+    font-size: clamp(9px, 2vw, 11px);
+    letter-spacing: 0.22em;
+    color: #4a5580;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+
+  /* ── Top panel wrapper (controls + settings) ── */
+  #top-panel {
+    z-index: 1;
+    background: rgba(10,13,30,0.7);
+    border: 1px solid #1a2040;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* ── Controls panel ── */
+  .controls {
+    display: flex;
+    gap: clamp(10px, 3vw, 22px);
+    align-items: flex-end;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: clamp(10px, 2.5vw, 16px) clamp(14px, 3vw, 22px);
+    width: 100%;
+  }
+
+  .ctrl-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .ctrl-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: #5a6888;
+    text-transform: uppercase;
+  }
+
+  .ctrl-value {
+    font-size: 20px;
+    color: #8899bb;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1;
+    min-width: 52px;
+    text-align: center;
+  }
+
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ctrl-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid #2a3455;
+    background: rgba(255,255,255,0.04);
+    color: #7a8baa;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .ctrl-btn:hover { border-color: #4a5880; color: #aabbdd; background: rgba(255,255,255,0.08); }
+  .ctrl-btn:active { background: rgba(255,255,255,0.13); }
+
+  /* ── Orb stage ── */
+  #stage {
+    position: relative;
+    width: clamp(190px, 50vw, 230px);
+    height: clamp(190px, 50vw, 230px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  #ring {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: visible;
+  }
+
+  #orb {
+    width: clamp(155px, 42vw, 190px);
+    height: clamp(155px, 42vw, 190px);
+    border-radius: 50%;
+    border: 1.5px solid var(--col);
+    background: radial-gradient(circle at 40% 38%, var(--col28) 0%, transparent 70%);
+    box-shadow: 0 0 var(--glow) var(--col), 0 0 calc(var(--glow) * 2.2) var(--col28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    transition: box-shadow 1.4s ease, border-color 1.4s ease, background 1.4s ease, opacity 0.9s ease;
+    animation: breathe 3.6s ease-in-out infinite;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #orb.pulsing {
+    animation: orb-pulse var(--pulse-speed) ease-in-out infinite;
+  }
+
+  #orb.dimmed { opacity: 0.4; cursor: default; }
+
+  #glyph {
+    font-size: clamp(32px, 9vw, 44px);
+    color: var(--col);
+    text-shadow: 0 0 28px var(--col);
+    transition: color 1.2s ease, text-shadow 1.2s ease;
+    line-height: 1;
+    font-family: serif;
+  }
+
+  /* Ripples */
+  .ripple {
+    position: absolute;
+    width: clamp(155px, 42vw, 190px);
+    height: clamp(155px, 42vw, 190px);
+    border-radius: 50%;
+    border: 1px solid var(--rc, #4a8ab0);
+    box-shadow: 0 0 6px var(--rc, #4a8ab0);
+    animation: ripple 2.6s ease-out forwards;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Phase label ── */
+  #phase-label {
+    font-size: clamp(10px, 2.5vw, 12px);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    text-align: center;
+    font-style: italic;
+    color: #8899cc;
+    min-height: 20px;
+    transition: color 1.2s ease;
+    z-index: 1;
+    max-width: 280px;
+    line-height: 1.6;
+  }
+
+  /* ── Action buttons row ── */
+  .action-row {
+    display: flex;
+    gap: 14px;
+    z-index: 1;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stop-btn {
+    padding: 9px 22px;
+    border-radius: 20px;
+    border: 1px solid #3a2222;
+    background: rgba(180,60,60,0.08);
+    color: #c07070;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(10px, 2.5vw, 12px);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-style: italic;
+  }
+  .stop-btn:hover { border-color: #7a3535; background: rgba(180,60,60,0.16); color: #e08080; }
+  .stop-btn:active { background: rgba(180,60,60,0.26); }
+  .stop-btn:disabled { opacity: 0.25; cursor: default; pointer-events: none; }
+
+  /* ── Advanced settings toggle ── */
+  #adv-toggle {
+    background: none;
+    border: none;
+    border-top: 1px solid #1a2040;
+    color: #3a4668;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(9px, 2vw, 11px);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-style: italic;
+    cursor: pointer;
+    padding: 10px 20px;
+    transition: color 0.2s;
+    text-align: center;
+    width: 100%;
+  }
+  #adv-toggle:hover { color: #6a7a9a; }
+
+  #adv-panel {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid #1a2040;
+    padding: 18px 20px 14px;
+    width: 100%;
+  }
+  #adv-panel.open { display: flex; }
+
+  .adv-section-title {
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    color: #2e3858;
+    text-transform: uppercase;
+    margin: 14px 0 8px;
+  }
+  .adv-section-title:first-child { margin-top: 0; }
+
+  .adv-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .adv-label {
+    font-size: clamp(11px, 2.5vw, 13px);
+    color: #6a7a9a;
+    font-style: italic;
+    flex: 1 1 0;
+    min-width: 130px;
+    line-height: 1.3;
+  }
+
+  .adv-label small {
+    display: block;
+    font-size: 9px;
+    color: #3a4668;
+    font-style: normal;
+    letter-spacing: 0.06em;
+    margin-top: 1px;
+  }
+
+  .adv-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 2 1 0;
+    height: 2px;
+    background: #1e2645;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  .adv-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #4a6090;
+    border: 1px solid #6a80b0;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .adv-slider::-webkit-slider-thumb:hover { background: #6a8ab8; }
+  .adv-slider::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #4a6090;
+    border: 1px solid #6a80b0;
+    cursor: pointer;
+  }
+
+  .adv-val {
+    font-size: 13px;
+    color: #7a8eaa;
+    font-style: italic;
+    font-weight: 300;
+    min-width: 38px;
+    text-align: right;
+  }
+
+  .adv-reset {
+    align-self: flex-end;
+    margin-top: 6px;
+    background: none;
+    border: 1px solid #1e2645;
+    border-radius: 10px;
+    color: #3a4668;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-style: italic;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .adv-reset:hover { color: #6a7a9a; border-color: #3a4870; }
+
+  /* ── Stats panel ── */
+  #stats {
+    display: none;
+    gap: clamp(16px, 4vw, 28px);
+    z-index: 1;
+    padding-top: 18px;
+    width: 100%;
+    max-width: 360px;
+    justify-content: center;
+  }
+  #stats.visible { display: flex; }
+
+  .stat-cell { text-align: center; }
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: #4a5580;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .stat-val {
+    font-size: clamp(18px, 4.5vw, 24px);
+    color: #7a8eaa;
+    font-weight: 300;
+    font-style: italic;
+  }
+  .stat-sub {
+    font-size: 9px;
+    color: #3a4465;
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── History dots ── */
+  #history {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 220px;
+    z-index: 1;
+    min-height: 13px;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: block;
+    cursor: default;
+  }
+
+  /* ── Intro prose ── */
+  #prose {
+    text-align: center;
+    color: #4a567a;
+    font-size: clamp(13px, 3.2vw, 15px);
+    line-height: 2.0;
+    letter-spacing: 0.03em;
+    font-style: italic;
+    max-width: 280px;
+    z-index: 1;
+  }
+  #prose span { color: #303858; }
+
+  /* ── Keyframes ── */
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.026); }
+  }
+  @keyframes orb-pulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.072); }
+  }
+  @keyframes ripple {
+    0%   { transform: scale(1);   opacity: 0.55; }
+    100% { transform: scale(2.8); opacity: 0; }
+  }
+
+  /* ── Scrollbar hide ── */
+  ::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────── -->
+<header>
+  <h1>Awareness</h1>
+  <p class="tagline">mindful attention recovery</p>
+</header>
+
+<!-- ── Top panel ──────────────────────────────────────────── -->
+<div id="top-panel">
+
+<!-- ── Controls ─────────────────────────────────────────── -->
+<div class="controls">
+
+  <div class="ctrl-group">
+    <div class="ctrl-label">Silence</div>
+    <div class="ctrl-row">
+      <button class="ctrl-btn" id="sil-down" aria-label="Decrease silence">−</button>
+      <div class="ctrl-value" id="sil-val">60s</div>
+      <button class="ctrl-btn" id="sil-up" aria-label="Increase silence">+</button>
+    </div>
+  </div>
+
+  <div class="ctrl-group">
+    <div class="ctrl-label">Escalation</div>
+    <div class="ctrl-row">
+      <button class="ctrl-btn" id="esc-down" aria-label="Decrease escalation">−</button>
+      <div class="ctrl-value" id="esc-val">5m</div>
+      <button class="ctrl-btn" id="esc-up" aria-label="Increase escalation">+</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Advanced settings toggle ────────────────────────── -->
+<button id="adv-toggle">⚙ Sound settings</button>
+
+<!-- ── Advanced settings panel ───────────────────────────────── -->
+<div id="adv-panel">
+
+  <div class="adv-section-title">Timing</div>
+
+  <div class="adv-row">
+    <div class="adv-label">First bell gap
+      <small>How long between bells at the very start</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-gap-start" min="6" max="60" step="1">
+    <div class="adv-val" id="v-gap-start"></div>
+  </div>
+
+  <div class="adv-row">
+    <div class="adv-label">Bell duration
+      <small>How long each bell rings before fading out</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-bell-decay" min="0.2" max="3.0" step="0.1">
+    <div class="adv-val" id="v-bell-decay"></div>
+  </div>
+
+  <div class="adv-row">
+    <div class="adv-label">Final bell gap
+      <small>Shortest gap at peak escalation</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-gap-end" min="0.2" max="3" step="0.1">
+    <div class="adv-val" id="v-gap-end"></div>
+  </div>
+
+  <div class="adv-row">
+    <div class="adv-label">Gap tightening speed
+      <small>How quickly gaps shorten — lower = slower build</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-gap-curve" min="0.1" max="1.5" step="0.05">
+    <div class="adv-val" id="v-gap-curve"></div>
+  </div>
+
+  <div class="adv-row">
+    <div class="adv-label">Timing randomness
+      <small>How unpredictably gaps vary from the start</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-jitter-start" min="0" max="0.9" step="0.05">
+    <div class="adv-val" id="v-jitter-start"></div>
+  </div>
+
+  <div class="adv-section-title">Volume</div>
+
+  <div class="adv-row">
+    <div class="adv-label">Starting volume
+      <small>How quiet the first bells are</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-vol-start" min="0.01" max="0.4" step="0.01">
+    <div class="adv-val" id="v-vol-start"></div>
+  </div>
+
+  <div class="adv-row">
+    <div class="adv-label">Volume rise speed
+      <small>How quickly bells get louder — higher = stays quiet longer</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-vol-curve" min="0.5" max="5" step="0.1">
+    <div class="adv-val" id="v-vol-curve"></div>
+  </div>
+
+  <div class="adv-section-title">Pitch &amp; Space</div>
+
+  <div class="adv-row">
+    <div class="adv-label">Starting pitch variation
+      <small>How much pitch wanders from bell to bell early on</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-pitch-start" min="0" max="2" step="0.05">
+    <div class="adv-val" id="v-pitch-start"></div>
+  </div>
+
+  <div class="adv-row">
+    <div class="adv-label">Starting stereo spread
+      <small>How wide bells move left/right at the start</small>
+    </div>
+    <input class="adv-slider" type="range" id="s-pan-start" min="0" max="0.5" step="0.02">
+    <div class="adv-val" id="v-pan-start"></div>
+  </div>
+
+  <button class="adv-reset" id="adv-reset">Reset to defaults</button>
+
+</div><!-- end adv-panel -->
+
+</div><!-- end top-panel -->
+
+<!-- ── Orb stage ───────────────────────────────────────────── -->
+<div id="stage">
+  <svg id="ring" viewBox="0 0 230 230" xmlns="http://www.w3.org/2000/svg">
+    <circle id="ring-bg" cx="115" cy="115" r="109" fill="none"
+      stroke="#4a8ab0" stroke-width="1.5" stroke-opacity="0" />
+    <circle id="ring-arc" cx="115" cy="115" r="109" fill="none"
+      stroke="#4a8ab0" stroke-width="2.5" stroke-linecap="round"
+      stroke-dasharray="685" stroke-dashoffset="685"
+      transform="rotate(-90 115 115)"
+      style="transition: stroke-dashoffset 0.5s ease, stroke 1.2s ease;" />
+  </svg>
+  <button id="orb" aria-label="Begin session" tabindex="0">
+    <span id="glyph">◌</span>
+  </button>
+</div>
+
+<!-- ── Phase label ─────────────────────────────────────────── -->
+<p id="phase-label">Touch the circle to begin</p>
+
+<!-- ── Stop button ─────────────────────────────────────────── -->
+<div class="action-row">
+  <button class="stop-btn" id="stop-btn" disabled>Stop session</button>
+</div>
+
+<!-- ── Stats panel ─────────────────────────────────────────── -->
+<div id="stats">
+  <div class="stat-cell">
+    <div class="stat-label">Sessions</div>
+    <div class="stat-val" id="s-total">—</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-label">Returns</div>
+    <div class="stat-val" id="s-returns">—</div>
+    <div class="stat-sub">total</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-label">Avg recovery</div>
+    <div class="stat-val" id="s-level">—</div>
+    <div class="stat-sub">lower = earlier</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-label">Practice time</div>
+    <div class="stat-val" id="s-practime">—</div>
+    <div class="stat-sub">total</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-label">Avg time</div>
+    <div class="stat-val" id="s-time">—</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-label">Silence</div>
+    <div class="stat-val" id="s-silence">—</div>
+    <div class="stat-sub" id="s-dir">—</div>
+  </div>
+</div>
+
+<!-- ── History dots ─────────────────────────────────────────── -->
+<div id="history"></div>
+
+<!-- ── Intro prose ──────────────────────────────────────────── -->
+<p id="prose">
+  A bell sounds. Then silence.<br>
+  When the bells return, they grow.<br>
+  The moment you notice — touch the circle.<br>
+  <span>The system learns your rhythm.</span>
+</p>
+
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────────────────────
+// MATH
+// ─────────────────────────────────────────────────────────────
+const lerp   = (a,b,t) => a + (b-a) * Math.max(0, Math.min(1,t));
+const eIn    = t => t*t;
+const eInOut = t => t<0.5 ? 2*t*t : 1-(-2*t+2)**2/2;
+
+function lerpHex(c1,c2,t) {
+  const p = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  const [r1,g1,b1]=p(c1),[r2,g2,b2]=p(c2);
+  return `rgb(${~~lerp(r1,r2,t)},${~~lerp(g1,g2,t)},${~~lerp(b1,b2,t)})`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// AUDIO ENGINE
+// Additive synthesis: inharmonic singing bowl partials
+// ─────────────────────────────────────────────────────────────
+class AudioEngine {
+  static PARTIALS = [
+    {r:1.000, a:1.00, d:7.5},
+    {r:2.756, a:0.42, d:5.8},
+    {r:5.404, a:0.18, d:3.8},
+    {r:8.933, a:0.09, d:2.2},
+    {r:13.34, a:0.04, d:1.3},
+  ];
+
+  constructor() { this.ctx=null; this.master=null; this.panner=null; this.ready=false; }
+
+  async init() {
+    if (this.ready) { if (this.ctx.state==='suspended') await this.ctx.resume(); return; }
+    this.ctx = new (window.AudioContext||window.webkitAudioContext)();
+    await this.ctx.resume();
+
+    this.master = this.ctx.createGain();
+    this.master.gain.value = 0.68;
+
+    this.panner = this.ctx.createStereoPanner();
+    this.panner.pan.value = 0;
+
+    const conv = this.ctx.createConvolver();
+    conv.buffer = this._makeIR(3.2, 3.0);
+
+    const dry = this.ctx.createGain(); dry.gain.value = 0.60;
+    const wet = this.ctx.createGain(); wet.gain.value = 0.46;
+
+    this.master.connect(this.panner);
+    this.panner.connect(dry);
+    this.panner.connect(conv);
+    conv.connect(wet);
+    dry.connect(this.ctx.destination);
+    wet.connect(this.ctx.destination);
+
+    this.ready = true;
+  }
+
+  _makeIR(dur, decay) {
+    const sr=this.ctx.sampleRate, len=Math.ceil(sr*dur);
+    const buf=this.ctx.createBuffer(2,len,sr);
+    for (let c=0;c<2;c++) {
+      const d=buf.getChannelData(c);
+      for (let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);
+    }
+    return buf;
+  }
+
+  _strike({freq,vol,decayMul,tension,pan}) {
+    if (!this.ready) return;
+    const now=this.ctx.currentTime;
+    this.panner.pan.setTargetAtTime(pan, now, 0.14);
+
+    const bus=this.ctx.createGain();
+    bus.gain.value=vol;
+    bus.connect(this.master);
+
+    AudioEngine.PARTIALS.forEach(({r,a,d},i) => {
+      const osc=this.ctx.createOscillator();
+      const g=this.ctx.createGain();
+
+      let f=freq*r;
+      if (tension>0 && i>0) {
+        const cents=tension*26*(i/AudioEngine.PARTIALS.length);
+        f*=Math.pow(2,cents/1200);
+      }
+
+      osc.type='sine';
+      osc.frequency.value=f;
+      const dt=d*decayMul;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(a, now+0.007);
+      g.gain.exponentialRampToValueAtTime(0.0001, now+dt);
+
+      osc.connect(g); g.connect(bus);
+      osc.start(now); osc.stop(now+dt+0.15);
+    });
+  }
+
+  // Acknowledgment bell — same volume as the first escalation bell
+  ack() {
+    this._strike({freq:330, vol:CFG.volStart, decayMul:0.24, tension:0, pan:0});
+  }
+
+  bell(params) {
+    const {volume,pitchVar,tension,decay,baseFreq,pan}=params;
+    const semDev=(Math.random()-0.5)*2*pitchVar;
+    const freq=baseFreq*Math.pow(2,semDev/12);
+    this._strike({freq, vol:volume, decayMul:decay*CFG.bellDecay, tension, pan});
+  }
+
+  dispose() { this.ctx?.close(); this.ready=false; }
+}
+
+// ─────────────────────────────────────────────────────────────
+// SOUND SETTINGS (user-adjustable)
+// ─────────────────────────────────────────────────────────────
+const CFG_DEFAULTS = {
+  gapStart:    28.0,   // seconds between bells at start
+  gapEnd:      0.55,   // seconds between bells at peak
+  gapCurve:    0.38,   // how quickly gap shortens (lower = slower)
+  jitterStart: 0.30,   // timing randomness at start (0–1)
+  volStart:    0.03,   // volume at start (0–1)
+  volCurve:    2.2,    // volume rise speed (higher = stays quiet longer)
+  pitchStart:  0.85,   // pitch variation at start (semitones)
+  panStart:    0.40,   // stereo spread at start (0–1)
+  bellDecay:   1.0,    // bell duration multiplier (1 = normal, 2 = longer, 0.3 = short)
+};
+
+let CFG = {...CFG_DEFAULTS};
+
+try {
+  const saved = localStorage.getItem('awareness_cfg');
+  if (saved) CFG = {...CFG_DEFAULTS, ...JSON.parse(saved)};
+} catch {}
+
+function saveCFG() {
+  try { localStorage.setItem('awareness_cfg', JSON.stringify(CFG)); } catch {}
+}
+
+const Esc = {
+  _duration: 180,
+
+  setDuration(s) { this._duration = s; },
+
+  params(lvl) {
+    const l = Math.max(0, Math.min(1, lvl));
+    const gapCurve = Math.pow(l, CFG.gapCurve);
+    return {
+      interval: lerp(CFG.gapStart, CFG.gapEnd, eIn(gapCurve)),
+      jitter:   lerp(CFG.jitterStart, 0.95, Math.pow(l, 0.5)),
+      volume:   lerp(CFG.volStart,    0.92, Math.pow(l, CFG.volCurve)),
+      pitchVar: lerp(CFG.pitchStart,  2.8,  Math.pow(l, 0.8)),
+      panRange: lerp(CFG.panStart,    0.97, Math.pow(l, 1.4)),
+      tension:  lerp(0,               0.70, Math.pow(l, 2.5)),
+      decay:    lerp(1.6,             0.26, eIn(l)),
+      baseFreq: 220 * Math.pow(2, lerp(0, 0.09, l*l)),
+    };
+  },
+
+  nextInterval(p) {
+    const dev=(Math.random()-0.5)*2*p.interval*p.jitter;
+    return Math.max(0.22, p.interval+dev);
+  },
+
+  nextPan(cur,p) {
+    if (p.panRange<0.04) return 0;
+    const step=(Math.random()-0.5)*0.55*p.panRange;
+    return Math.max(-p.panRange, Math.min(p.panRange, cur+step));
+  },
+
+  delta(intervalSec) { return intervalSec/this._duration; },
+
+  color(l) {
+    const t=Math.max(0,Math.min(1,l));
+    return t<0.5
+      ? lerpHex('#4a8ab0','#8b6cc4',t*2)
+      : lerpHex('#8b6cc4','#c47a3a',(t-0.5)*2);
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
+// ADAPTIVE MEMORY (localStorage)
+// ─────────────────────────────────────────────────────────────
+const Mem = {
+  KEY:    'awareness_v3',
+  TARGET: 0.33,
+  blank:  () => ({sessions:[], totalReturns:0, totalPracticeTime:0}),
+
+  load() {
+    try { const r=localStorage.getItem(Mem.KEY); return r?{...Mem.blank(),...JSON.parse(r)}:Mem.blank(); }
+    catch { return Mem.blank(); }
+  },
+
+  save(d) { try { localStorage.setItem(Mem.KEY,JSON.stringify(d)); } catch {} },
+
+  integrate(data, {level,timeToAck,silence,practiceTime}) {
+    const sessions=[...data.sessions,{ts:Date.now(),level,timeToAck,silence,practiceTime:practiceTime||0}].slice(-30);
+    const totalReturns = (data.totalReturns||0) + 1;
+    const totalPracticeTime = (data.totalPracticeTime||0) + (practiceTime||0);
+    let newSilence=silence;
+    if (sessions.length>=3) {
+      const recent=sessions.slice(-6);
+      const avg=recent.reduce((s,x)=>s+x.level,0)/recent.length;
+      const err=avg-Mem.TARGET;
+      newSilence=Math.round(Math.max(10,Math.min(600,silence*(1-err*0.18)))/5)*5;
+    }
+    return {sessions, totalReturns, totalPracticeTime, suggestedSilence:newSilence};
+  },
+
+  stats(data) {
+    const sessions = data.sessions || data; // handle both old and new format
+    if (!sessions.length) return null;
+    const r=sessions.slice(-10);
+    return {
+      total:             data.totalReturns || sessions.length,
+      avgLevel:          r.reduce((s,x)=>s+x.level,0)/r.length,
+      avgTime:           r.reduce((s,x)=>s+x.timeToAck,0)/r.length,
+      totalPracticeTime: data.totalPracticeTime || sessions.reduce((a,x)=>a+(x.practiceTime||0),0),
+    };
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
+// DOM REFS
+// ─────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const orb      = $('orb');
+const glyph    = $('glyph');
+const stage    = $('stage');
+const ringBg   = $('ring-bg');
+const ringArc  = $('ring-arc');
+const phLabel  = $('phase-label');
+const stopBtn  = $('stop-btn');
+const silVal   = $('sil-val');
+const escVal   = $('esc-val');
+const prose    = $('prose');
+const statsEl  = $('stats');
+const histEl   = $('history');
+
+// ─────────────────────────────────────────────────────────────
+// SETTINGS STATE
+// ─────────────────────────────────────────────────────────────
+const SIL_STEPS  = [10,15,20,30,45,60,90,120,180,240,300,360,480,600];
+const ESC_STEPS  = [30,60,90,120,180,240,300,420,600]; // seconds
+
+let silIdx  = SIL_STEPS.indexOf(45);   // 1 min default
+let escIdx  = ESC_STEPS.indexOf(90);  // 5 min default
+
+function fmtSil(s) { return s<60?`${s}s`:`${s/60}m`; }
+function fmtEsc(s) { return s<60?`${s}s`:s%60===0?`${s/60}m`:`${~~(s/60)}m${s%60}s`; }
+
+function updateSilDisplay() { silVal.textContent=fmtSil(SIL_STEPS[silIdx]); }
+function updateEscDisplay() {
+  escVal.textContent=fmtEsc(ESC_STEPS[escIdx]);
+  Esc.setDuration(ESC_STEPS[escIdx]);
+}
+
+$('sil-down').addEventListener('click',()=>{ if(silIdx>0){ silIdx--; updateSilDisplay(); }});
+$('sil-up'  ).addEventListener('click',()=>{ if(silIdx<SIL_STEPS.length-1){ silIdx++; updateSilDisplay(); }});
+$('esc-down').addEventListener('click',()=>{ if(escIdx>0){ escIdx--; updateEscDisplay(); }});
+$('esc-up'  ).addEventListener('click',()=>{ if(escIdx<ESC_STEPS.length-1){ escIdx++; updateEscDisplay(); }});
+
+updateSilDisplay();
+updateEscDisplay();
+
+// ─────────────────────────────────────────────────────────────
+// APP STATE
+// ─────────────────────────────────────────────────────────────
+const Ph = {IDLE:'idle',ACKING:'acking',SILENT:'silent',ESCALATING:'escalating'};
+
+let phase   = Ph.IDLE;
+let level   = 0;
+let panPos  = 0;
+let escTS   = 0;
+let escTmr  = null;
+let silTmr  = null;
+let cdInt   = null;
+let peakTmr = null;        // fires 2 min after level=1 if no ack
+let sessionStartTS = 0;    // when the full session started (first orb press)
+let dbData  = Mem.load();
+const audio = new AudioEngine();
+
+const RING_CIRC = 2 * Math.PI * 109; // r=109
+
+// ─────────────────────────────────────────────────────────────
+// VISUAL UPDATE
+// ─────────────────────────────────────────────────────────────
+const glyphs = {
+  [Ph.IDLE]:'◌', [Ph.ACKING]:'◉', [Ph.SILENT]:'○', [Ph.ESCALATING]:'◎'
+};
+
+function setColor(col) {
+  const col28 = col+'28';
+  const glowPx = lerp(14, 72, level);
+  document.documentElement.style.setProperty('--col', col);
+  document.documentElement.style.setProperty('--col28', col28);
+  document.documentElement.style.setProperty('--glow', `${glowPx}px`);
+
+  orb.style.borderColor   = col;
+  orb.style.boxShadow     = `0 0 ${glowPx}px ${col}, 0 0 ${glowPx*2.2}px ${col28}`;
+  orb.style.background    = `radial-gradient(circle at 40% 38%, ${col}1e 0%, ${col}09 55%, transparent 100%)`;
+  glyph.style.color       = col;
+  glyph.style.textShadow  = `0 0 28px ${col}`;
+  ringArc.setAttribute('stroke', col);
+  ringBg.setAttribute('stroke', col);
+
+  if (phase===Ph.ESCALATING) {
+    phLabel.style.color = col;
+  } else {
+    phLabel.style.color = '#8899cc';
+  }
+}
+
+function updateRing() {
+  if (phase===Ph.ESCALATING) {
+    ringBg.setAttribute('stroke-opacity','0.14');
+    ringArc.setAttribute('stroke-dashoffset', RING_CIRC*(1-level));
+  } else {
+    ringBg.setAttribute('stroke-opacity','0');
+    ringArc.setAttribute('stroke-dashoffset', RING_CIRC);
+  }
+}
+
+function setPulse(speed) {
+  document.documentElement.style.setProperty('--pulse-speed',`${speed}s`);
+}
+
+function setOrbAnim(mode) {
+  orb.classList.remove('pulsing','dimmed');
+  if (mode==='pulse')  orb.classList.add('pulsing');
+  if (mode==='dimmed') orb.classList.add('dimmed');
+}
+
+function addRipple(col) {
+  const el=document.createElement('span');
+  el.className='ripple';
+  el.style.setProperty('--rc',col);
+  stage.appendChild(el);
+  setTimeout(()=>el.remove(), 2800);
+}
+
+function setPhaseLabel(txt) { phLabel.textContent=txt; }
+
+function updateOrbForPhase() {
+  glyph.textContent = glyphs[phase]||'◌';
+  const col = Esc.color(level);
+
+  switch(phase) {
+    case Ph.IDLE:
+      setColor('#4a8ab0'); setOrbAnim('breathe'); setPulse(3.6);
+      setPhaseLabel('Touch the circle to begin');
+      orb.style.opacity='1'; orb.style.cursor='pointer';
+      stopBtn.disabled=true;
+      setCtrlsDisabled(false);
+      break;
+    case Ph.ACKING:
+      setColor('#4a8ab0'); setOrbAnim('');
+      setPhaseLabel('Returning…');
+      orb.style.opacity='1'; orb.style.cursor='default';
+      stopBtn.disabled=false;
+      break;
+    case Ph.SILENT:
+      setColor('#4a8ab0'); setOrbAnim('dimmed');
+      orb.style.cursor='default';
+      stopBtn.disabled=false;
+      setCtrlsDisabled(true);
+      break;
+    case Ph.ESCALATING:
+      setColor(col); setOrbAnim('pulse');
+      setPhaseLabel('Return to awareness · touch the circle');
+      orb.style.opacity='1'; orb.style.cursor='pointer';
+      stopBtn.disabled=false;
+      break;
+  }
+  updateRing();
+}
+
+function setCtrlsDisabled(off) {
+  ['sil-down','sil-up','esc-down','esc-up'].forEach(id=>{
+    $(id).disabled=off;
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// STATS & HISTORY UI
+// ─────────────────────────────────────────────────────────────
+function fmtDuration(sec) {
+  if (!sec || sec < 1) return '—';
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = Math.round(sec%60);
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+function renderStats() {
+  const s=Mem.stats(dbData);
+  if (!s) { statsEl.classList.remove('visible'); prose.style.display=''; return; }
+  prose.style.display='none';
+  statsEl.classList.add('visible');
+  $('s-total').textContent=s.total;
+  $('s-returns').textContent=s.total;
+  $('s-level').textContent=`${(s.avgLevel*100).toFixed(0)}%`;
+  $('s-time').textContent=`${s.avgTime.toFixed(0)}s`;
+  $('s-silence').textContent=fmtSil(SIL_STEPS[silIdx]);
+  $('s-practime').textContent = fmtDuration(s.totalPracticeTime);
+  $('s-dir').textContent=
+    s.avgLevel<0.25?'↑ lengthening':
+    s.avgLevel>0.55?'↓ shortening':'→ calibrated';
+}
+
+function renderHistory() {
+  histEl.innerHTML='';
+  dbData.sessions.slice(-20).forEach((s,i)=>{
+    const c=Esc.color(s.level);
+    const dot=document.createElement('span');
+    dot.className='dot';
+    dot.style.backgroundColor=c;
+    dot.style.boxShadow=`0 0 5px ${c}`;
+    dot.style.opacity=0.38+s.level*0.62;
+    dot.title=`Session ${i+1}: ${(s.level*100).toFixed(0)}% · ${s.timeToAck?.toFixed(0)}s`;
+    histEl.appendChild(dot);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// TIMERS
+// ─────────────────────────────────────────────────────────────
+function clearAll() {
+  clearTimeout(escTmr);
+  clearTimeout(silTmr);
+  clearInterval(cdInt);
+  clearTimeout(peakTmr);
+  escTmr=silTmr=cdInt=peakTmr=null;
+}
+
+let _cdCount=0;
+function startSilent(dur) {
+  phase=Ph.SILENT; level=0;
+  updateOrbForPhase();
+  _cdCount=dur;
+  setPhaseLabel(`Silent · ${_cdCount}s`);
+  cdInt=setInterval(()=>{
+    _cdCount=Math.max(0,_cdCount-1);
+    setPhaseLabel(`Silent · ${_cdCount}s`);
+  },1000);
+  silTmr=setTimeout(()=>{
+    clearInterval(cdInt); cdInt=null;
+    beginEscalation();
+  }, dur*1000);
+}
+
+function beginEscalation() {
+  phase=Ph.ESCALATING; level=0; panPos=0;
+  escTS=Date.now();
+  updateOrbForPhase();
+  escTmr=setTimeout(bellTick, 300);
+}
+
+function bellTick() {
+  if (phase!==Ph.ESCALATING) return;
+  const p=Esc.params(level);
+  panPos=Esc.nextPan(panPos,p);
+  audio.bell({...p,pan:panPos});
+  addRipple(Esc.color(level));
+
+  const dt=Esc.nextInterval(p);
+  level=Math.min(1, level+Esc.delta(dt));
+
+  // Update visuals every tick
+  const col=Esc.color(level);
+  setColor(col);
+  const ps=lerp(2.8,0.34,eIn(level));
+  setPulse(ps);
+  updateRing();
+
+  // At peak: start 2-min auto-stop countdown (only once)
+  if (level>=1 && peakTmr===null) {
+    peakTmr=setTimeout(()=>{
+      if (phase===Ph.ESCALATING) {
+        // Record as missed (level 1, no ack)
+        const timeToAck=(Date.now()-escTS)/1000;
+        const practiceTime=sessionStartTS ? (Date.now()-sessionStartTS)/1000 : 0;
+        const {sessions,totalReturns,totalPracticeTime}=Mem.integrate(dbData,{level:1, timeToAck, silence:SIL_STEPS[silIdx], practiceTime});
+        dbData={...dbData, sessions, totalReturns, totalPracticeTime};
+        Mem.save(dbData);
+        renderStats(); renderHistory();
+        handleStop();
+        setPhaseLabel('Session ended — no return detected');
+      }
+    }, 120_000);
+  }
+
+  if (level < 1) escTmr=setTimeout(bellTick, dt*1000);
+  else escTmr=setTimeout(bellTick, dt*1000); // keep ringing at peak until ack or timeout
+}
+
+// ─────────────────────────────────────────────────────────────
+// ORB PRESS (main interaction)
+// ─────────────────────────────────────────────────────────────
+async function handleOrbPress() {
+  if (phase===Ph.SILENT || phase===Ph.ACKING) return;
+  await audio.init();
+  clearAll();
+
+  if (phase===Ph.IDLE) {
+    sessionStartTS = Date.now();
+    phase=Ph.ACKING;
+    updateOrbForPhase();
+    audio.ack();
+    addRipple('#4a8ab0');
+    setTimeout(()=>startSilent(SIL_STEPS[silIdx]), 900);
+
+  } else if (phase===Ph.ESCALATING) {
+    const ackLevel=level;
+    const timeToAck=(Date.now()-escTS)/1000;
+    const practiceTime=sessionStartTS ? (Date.now()-sessionStartTS)/1000 : 0;
+    const curSil=SIL_STEPS[silIdx];
+
+    phase=Ph.ACKING;
+    updateOrbForPhase();
+    audio.ack();
+    addRipple('#4a8ab0');
+
+    // Integrate into adaptive memory
+    const {sessions,totalReturns,totalPracticeTime,suggestedSilence}=Mem.integrate(dbData,{
+      level:ackLevel, timeToAck, silence:curSil, practiceTime
+    });
+    dbData={...dbData, sessions, totalReturns, totalPracticeTime};
+    Mem.save(dbData);
+
+    // Nudge silence setting toward suggested value (softly)
+    if (suggestedSilence!==curSil) {
+      let best=silIdx;
+      let bestDist=Infinity;
+      SIL_STEPS.forEach((v,i)=>{
+        const d=Math.abs(v-suggestedSilence);
+        if(d<bestDist){bestDist=d;best=i;}
+      });
+      silIdx=best;
+      updateSilDisplay();
+    }
+
+    renderStats();
+    renderHistory();
+
+    setTimeout(()=>startSilent(SIL_STEPS[silIdx]), 900);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// STOP BUTTON
+// ─────────────────────────────────────────────────────────────
+function handleStop() {
+  clearAll();
+  level=0; panPos=0;
+  phase=Ph.IDLE;
+  updateOrbForPhase();
+  setColor('#4a8ab0');
+  updateRing();
+  setCtrlsDisabled(false);
+}
+
+// ─────────────────────────────────────────────────────────────
+// EVENT LISTENERS
+// ─────────────────────────────────────────────────────────────
+orb.addEventListener('click', handleOrbPress);
+orb.addEventListener('touchend', e=>{ e.preventDefault(); handleOrbPress(); });
+stopBtn.addEventListener('click', handleStop);
+
+// ─────────────────────────────────────────────────────────────
+// ADVANCED SETTINGS UI
+// ─────────────────────────────────────────────────────────────
+const advToggle = $('adv-toggle');
+const advPanel  = $('adv-panel');
+const advReset  = $('adv-reset');
+
+advToggle.addEventListener('click', () => {
+  const open = advPanel.classList.toggle('open');
+  advToggle.textContent = open ? '⚙ Hide settings' : '⚙ Sound settings';
+});
+
+// Map: slider id → { key in CFG, display formatter }
+const ADV_SLIDERS = [
+  { id:'s-gap-start',    key:'gapStart',    fmt: v => `${v}s` },
+  { id:'s-bell-decay',   key:'bellDecay',   fmt: v => v <= 0.4 ? 'very short' : v <= 0.7 ? 'short' : v <= 1.3 ? 'normal' : v <= 2.0 ? 'long' : 'very long' },
+  { id:'s-gap-end',      key:'gapEnd',      fmt: v => `${v}s` },
+  { id:'s-gap-curve',    key:'gapCurve',    fmt: v => v <= 0.4 ? 'slow' : v <= 0.8 ? 'medium' : v <= 1.2 ? 'fast' : 'sharp' },
+  { id:'s-jitter-start', key:'jitterStart', fmt: v => `${Math.round(v*100)}%` },
+  { id:'s-vol-start',    key:'volStart',    fmt: v => `${Math.round(v*100)}%` },
+  { id:'s-vol-curve',    key:'volCurve',    fmt: v => v <= 1.2 ? 'linear' : v <= 2.5 ? 'gradual' : v <= 3.8 ? 'slow' : 'late' },
+  { id:'s-pitch-start',  key:'pitchStart',  fmt: v => `±${v} st` },
+  { id:'s-pan-start',    key:'panStart',    fmt: v => v < 0.05 ? 'none' : `${Math.round(v*100)}%` },
+];
+
+function syncSliderUI() {
+  ADV_SLIDERS.forEach(({id, key, fmt}) => {
+    const slider = $(id);
+    const valEl  = $('v-' + id.slice(2)); // strip 's-'
+    slider.value = CFG[key];
+    valEl.textContent = fmt(CFG[key]);
+  });
+}
+
+ADV_SLIDERS.forEach(({id, key, fmt}) => {
+  const slider = $(id);
+  const valEl  = $('v-' + id.slice(2));
+  slider.addEventListener('input', () => {
+    CFG[key] = parseFloat(slider.value);
+    valEl.textContent = fmt(CFG[key]);
+    saveCFG();
+  });
+});
+
+advReset.addEventListener('click', () => {
+  CFG = {...CFG_DEFAULTS};
+  saveCFG();
+  syncSliderUI();
+});
+
+syncSliderUI();
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+renderStats();
+renderHistory();
+updateOrbForPhase();
+</script>
+</body>
+</html>

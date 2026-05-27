@@ -23,9 +23,9 @@ jobs:
           mkdir -p ~/.config/rclone
           printf '[gdrive]\ntype = drive\nscope = drive\ntoken = %s\nroot_folder_id = 1LxdBM01phS4BbYylBCCbgI-HcYOHhWJJ\n' "$GDRIVE_TOKEN" > ~/.config/rclone/rclone.conf
 
-      - name: Sync repo to Google Drive
+      - name: Copy repo to Google Drive
         run: |
-          rclone sync . gdrive:${{ github.event.repository.name }} \
+          rclone copy . gdrive:${{ github.event.repository.name }} \
             --exclude ".git/**" \
             --exclude ".github/**" \
             --exclude "*.md" \

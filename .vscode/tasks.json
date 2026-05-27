@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "Backup to Google Drive",
-      "detail": "Stage all, commit, and push — triggers the backup workflow automatically",
+      "detail": "Stage all, commit, and push — triggers the backup workflows automatically",
       "type": "shell",
       "command": "git add -A; git commit -m '${input:commitMessage}'; git push",
       "group": "build",

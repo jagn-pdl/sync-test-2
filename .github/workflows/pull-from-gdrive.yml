@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Type YES to confirm overwrite of repo content'
+        description: 'Type YES to confirm overwrite of repo contents'
         required: true
 
 jobs:
@@ -27,14 +27,13 @@ jobs:
       - name: Configure rclone
         run: |
           mkdir -p ~/.config/rclone
-          cat > ~/.config/rclone/rclone.conf << RCLONE
+          cat > ~/.config/rclone/rclone.conf << EOF
           [gdrive]
           type = drive
           scope = drive
-          service_account_file = /tmp/sa.json
+          token = ${{ secrets.GDRIVE_TOKEN }}
           root_folder_id = 1LxdBM01phS4BbYylBCCbgI-HcYOHhWJJ
-          RCLONE
-          echo '${{ secrets.GDRIVE_CREDENTIALS }}' > /tmp/sa.json
+          EOF
 
       - name: Pull from Google Drive to repo
         run: |

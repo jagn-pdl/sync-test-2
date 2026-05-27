@@ -14,9 +14,9 @@
     },
     {
       "label": "Restore from Google Drive",
-      "detail": "Triggers pull-from-gdrive workflow — run git pull manually once workflow completes",
+      "detail": "Triggers workflow, waits for it to complete, then auto pulls",
       "type": "shell",
-      "command": "gh workflow run pull-from-gdrive.yml --ref main --field confirm=YES",
+      "command": "gh workflow run pull-from-gdrive.yml --ref main --field confirm=YES; Start-Sleep -Seconds 3; gh run watch; git pull",
       "group": "build",
       "presentation": {
         "reveal": "always",

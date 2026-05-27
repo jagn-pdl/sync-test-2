@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "Backup to Google Drive",
-      "detail": "Stage all, commit, and push — triggers the backup workflows automatically",
+      "detail": "Stage all, commit, and push — triggers the backup workflow automatically",
       "type": "shell",
       "command": "git add -A; git commit -m '${input:commitMessage}'; git push",
       "group": "build",
@@ -14,9 +14,9 @@
     },
     {
       "label": "Restore from Google Drive",
-      "detail": "Triggers workflow, waits for it to complete, then auto pulls",
+      "detail": "Triggers workflow, waits for completion, then auto pulls — no interaction needed",
       "type": "shell",
-      "command": "gh workflow run pull-from-gdrive.yml --ref main --field confirm=YES; Start-Sleep -Seconds 3; gh run watch; git pull",
+      "command": "gh workflow run pull-from-gdrive.yml --ref main --field confirm=YES; Start-Sleep -Seconds 3; $runId = (gh run list --workflow=pull-from-gdrive.yml --limit 1 --json databaseId --jq '.[0].databaseId'); gh run watch $runId; git pull",
       "group": "build",
       "presentation": {
         "reveal": "always",

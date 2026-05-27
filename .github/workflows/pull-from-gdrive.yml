@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Type YES to confirm overwrite of repo contents'
+        description: 'Type YES to confirm overwrite of repo content'
         required: true
 
 jobs:
